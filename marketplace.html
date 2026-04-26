@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentaYa · Marketplace de Alquiler</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f5f0;
+      --white: #ffffff;
+      --ink: #1a1410;
+      --ink-2: #4a4540;
+      --ink-3: #8a8480;
+      --green: #1a5c38;
+      --green-light: #e8f2ec;
+      --green-mid: #2e7d4f;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --blue: #1d4ed8;
+      --blue-light: #eff6ff;
+      --border: #e5e0d8;
+      --shadow: 0 1px 3px rgba(26,20,16,.06), 0 8px 24px rgba(26,20,16,.05);
+      --shadow-lg: 0 4px 6px rgba(26,20,16,.04), 0 20px 48px rgba(26,20,16,.1);
+      --r: 16px;
+      --r-lg: 24px;
+      --r-xl: 32px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position:sticky; top:0; z-index:100;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:1.5rem;
+      padding:0 2rem; height:64px;
+    }
+    .logo {
+      font-family:'DM Serif Display',serif;
+      font-size:1.5rem; color:var(--green);
+      cursor:pointer; white-space:nowrap;
+      display:flex; align-items:center; gap:6px;
+    }
+    .logo span { color:var(--amber); }
+    .topbar-nav { display:flex; gap:0.2rem; margin-left:auto; }
+    .nav-btn {
+      padding:0.45rem 1rem; border-radius:40px;
+      font-size:0.85rem; font-weight:600; cursor:pointer;
+      border:none; background:transparent; color:var(--ink-2);
+      transition:.18s;
+    }
+    .nav-btn:hover { background:var(--green-light); color:var(--green); }
+    .nav-btn.active { background:var(--green-light); color:var(--green); }
+    .nav-btn.cta {
+      background:var(--green); color:#fff; margin-left:.3rem;
+    }
+    .nav-btn.cta:hover { background:var(--green-mid); }
+    .nav-btn.outline {
+      border:1.5px solid var(--border); background:#fff;
+    }
+
+    /* ── PAGE SYSTEM ── */
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* ── HOME PAGE ── */
+    .hero {
+      background: linear-gradient(135deg, #0f3d24 0%, #1a5c38 50%, #2e7d4f 100%);
+      padding: 5rem 2rem 4rem;
+      text-align:center;
+      position:relative; overflow:hidden;
+    }
+    .hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 20%, rgba(217,119,6,0.12) 0%, transparent 50%);
+    }
+    .hero-content { position:relative; z-index:1; max-width:700px; margin:0 auto; }
+    .hero h1 {
+      font-family:'DM Serif Display',serif;
+      font-size:clamp(2.2rem,5vw,3.8rem);
+      color:#fff; line-height:1.12; margin-bottom:1rem;
+    }
+    .hero h1 em { font-style:italic; color:#fde68a; }
+    .hero p { color:rgba(255,255,255,.75); font-size:1.05rem; margin-bottom:2.5rem; }
+
+    .search-box {
+      background:#fff;
+      border-radius:60px;
+      display:flex; align-items:center;
+      padding:6px 6px 6px 1.5rem;
+      max-width:580px; margin:0 auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    }
+    .search-box input {
+      flex:1; border:none; outline:none;
+      font-size:0.95rem; font-family:'DM Sans',sans-serif;
+      background:transparent; color:var(--ink);
+    }
+    .search-box input::placeholder { color:var(--ink-3); }
+    .search-box button {
+      background:var(--green); color:#fff; border:none;
+      padding:.75rem 1.8rem; border-radius:50px;
+      font-weight:700; font-size:0.9rem; cursor:pointer;
+      transition:.18s; white-space:nowrap;
+    }
+    .search-box button:hover { background:var(--green-mid); }
+
+    .hero-tags { display:flex; gap:.6rem; justify-content:center; margin-top:1.2rem; flex-wrap:wrap; }
+    .tag-pill {
+      background:rgba(255,255,255,.15); color:#fff;
+      border:1px solid rgba(255,255,255,.25);
+      padding:.3rem .9rem; border-radius:30px;
+      font-size:.78rem; font-weight:500; cursor:pointer;
+      transition:.18s;
+    }
+    .tag-pill:hover { background:rgba(255,255,255,.25); }
+
+    /* Stats bar */
+    .stats-bar {
+      background:#fff; border-bottom:1px solid var(--border);
+      display:flex; justify-content:center; gap:0;
+      flex-wrap:wrap;
+    }
+    .stat-item {
+      padding:1rem 2.5rem; text-align:center;
+      border-right:1px solid var(--border);
+    }
+    .stat-item:last-child { border-right:none; }
+    .stat-num { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--green); }
+    .stat-label { font-size:.72rem; color:var(--ink-3); font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
+
+    /* Section */
+    .section { padding:3rem 2rem; max-width:1280px; margin:0 auto; }
+    .section-header {
+      display:flex; justify-content:space-between; align-items:baseline;
+      margin-bottom:1.8rem; flex-wrap:wrap; gap:.5rem;
+    }
+    .section-title {
+      font-family:'DM Serif Display',serif;
+      font-size:1.7rem; color:var(--ink);
+    }
+    .see-all {
+      font-size:.85rem; font-weight:600; color:var(--green);
+      cursor:pointer; text-decoration:none;
+    }
+    .see-all:hover { text-decoration:underline; }
+
+    /* Filter chips */
+    .filter-bar { display:flex; gap:.5rem; margin-bottom:1.8rem; flex-wrap:wrap; }
+    .chip {
+      padding:.4rem 1rem; border-radius:30px;
+      border:1.5px solid var(--border); background:#fff;
+      font-size:.82rem; font-weight:500; cursor:pointer;
+      transition:.18s; color:var(--ink-2);
+    }
+    .chip:hover, .chip.active { border-color:var(--green); background:var(--green-light); color:var(--green); }
+
+    /* Property grid */
+    .prop-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+      gap:1.4rem;
+    }
+    .prop-card {
+      background:#fff; border-radius:var(--r-lg);
+      overflow:hidden; box-shadow:var(--shadow);
+      transition:.22s; cursor:pointer;
+      border:1px solid var(--border);
+    }
+    .prop-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+    .prop-img {
+      height:180px; background:var(--green-light);
+      position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      font-size:3rem;
+    }
+    .prop-img .img-bg {
+      position:absolute; inset:0;
+      background:linear-gradient(135deg, var(--green-light), #d1fae5);
+    }
+    .prop-badge {
+      position:absolute; top:10px; left:10px;
+      background:var(--green); color:#fff;
+      font-size:.68rem; font-weight:700; padding:.25rem .7rem;
+      border-radius:20px; text-transform:uppercase; letter-spacing:.4px;
+    }
+    .prop-badge.featured { background:var(--amber); }
+    .score-pill {
+      position:absolute; top:10px; right:10px;
+      background:rgba(255,255,255,.95);
+      font-size:.72rem; font-weight:700;
+      padding:.25rem .65rem; border-radius:20px;
+      display:flex; align-items:center; gap:4px;
+    }
+    .score-dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
+    .score-dot.mid { background:var(--amber); }
+    .score-dot.low { background:var(--red); }
+    .prop-body { padding:1rem 1.2rem 1.2rem; }
+    .prop-price {
+      font-family:'DM Serif Display',serif;
+      font-size:1.25rem; color:var(--green);
+    }
+    .prop-price span { font-size:.8rem; font-family:'DM Sans',sans-serif; color:var(--ink-3); font-weight:400; }
+    .prop-title {
+      font-weight:600; font-size:.92rem; margin:.3rem 0 .4rem;
+      color:var(--ink); line-height:1.3;
+    }
+    .prop-loc { font-size:.78rem; color:var(--ink-3); display:flex; align-items:center; gap:4px; }
+    .prop-feats {
+      display:flex; gap:.6rem; margin-top:.8rem; flex-wrap:wrap;
+    }
+    .feat-tag {
+      font-size:.72rem; background:var(--bg); color:var(--ink-2);
+      padding:.2rem .65rem; border-radius:20px; font-weight:500;
+    }
+    .prop-footer {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.8rem 1.2rem; border-top:1px solid var(--border);
+      font-size:.78rem; color:var(--ink-3);
+    }
+    .btn-contact {
+      background:var(--green); color:#fff; border:none;
+      padding:.45rem 1rem; border-radius:30px;
+      font-size:.78rem; font-weight:700; cursor:pointer;
+      transition:.18s;
+    }
+    .btn-contact:hover { background:var(--green-mid); }
+
+    /* How it works */
+    .how-section {
+      background:linear-gradient(135deg, #0f3d24, #1a5c38);
+      padding:4rem 2rem;
+      text-align:center;
+    }
+    .how-title {
+      font-family:'DM Serif Display',serif;
+      font-size:2rem; color:#fff; margin-bottom:.5rem;
+    }
+    .how-sub { color:rgba(255,255,255,.7); margin-bottom:3rem; }
+    .how-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+      gap:1.5rem; max-width:900px; margin:0 auto;
+    }
+    .how-card {
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:var(--r-lg); padding:1.8rem 1.4rem;
+    }
+    .how-icon { font-size:2.2rem; margin-bottom:.8rem; }
+    .how-card h3 { color:#fff; font-size:.95rem; font-weight:600; margin-bottom:.4rem; }
+    .how-card p { color:rgba(255,255,255,.65); font-size:.82rem; line-height:1.5; }
+
+    /* ── AUTH PAGE ── */
+    .auth-wrap {
+      min-height: calc(100vh - 64px);
+      display:flex; align-items:center; justify-content:center;
+      padding:2rem; background:var(--bg);
+    }
+    .auth-card {
+      background:#fff; border-radius:var(--r-xl);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-lg);
+      width:100%; max-width:440px;
+      overflow:hidden;
+    }
+    .auth-tabs {
+      display:flex; border-bottom:1px solid var(--border);
+    }
+    .auth-tab {
+      flex:1; padding:1rem; text-align:center;
+      font-weight:600; font-size:.9rem; cursor:pointer;
+      border:none; background:#fff; color:var(--ink-3);
+      transition:.18s;
+    }
+    .auth-tab.active {
+      color:var(--green); border-bottom:2.5px solid var(--green);
+      background:var(--green-light);
+    }
+    .auth-body { padding:2rem; }
+    .auth-logo {
+      text-align:center; margin-bottom:1.5rem;
+    }
+    .auth-logo h2 {
+      font-family:'DM Serif Display',serif;
+      font-size:1.6rem; color:var(--ink);
+    }
+    .auth-logo p { font-size:.84rem; color:var(--ink-3); margin-top:.3rem; }
+    .auth-form { display:flex; flex-direction:column; gap:1rem; }
+    .form-field { display:flex; flex-direction:column; gap:.4rem; }
+    .form-field label {
+      font-size:.75rem; font-weight:600; color:var(--ink-2);
+      text-transform:uppercase; letter-spacing:.4px;
+    }
+    .form-field input, .form-field select {
+      padding:.8rem 1rem; border:1.5px solid var(--border);
+      border-radius:var(--r); font-size:.9rem; font-family:'DM Sans',sans-serif;
+      transition:.18s; outline:none; background:#fff; color:var(--ink);
+    }
+    .form-field input:focus, .form-field select:focus {
+      border-color:var(--green);
+      box-shadow:0 0 0 3px rgba(26,92,56,.1);
+    }
+    .btn-full {
+      width:100%; padding:.9rem; border:none; border-radius:var(--r);
+      font-size:1rem; font-weight:700; cursor:pointer; transition:.18s;
+      font-family:'DM Sans',sans-serif;
+    }
+    .btn-full.green { background:var(--green); color:#fff; }
+    .btn-full.green:hover { background:var(--green-mid); }
+    .divider {
+      display:flex; align-items:center; gap:1rem;
+      font-size:.78rem; color:var(--ink-3); margin:.5rem 0;
+    }
+    .divider::before, .divider::after {
+      content:''; flex:1; height:1px; background:var(--border);
+    }
+    .role-selector { display:flex; gap:.8rem; }
+    .role-btn {
+      flex:1; padding:.8rem; border-radius:var(--r);
+      border:1.5px solid var(--border); background:#fff;
+      text-align:center; cursor:pointer; transition:.18s;
+    }
+    .role-btn .role-icon { font-size:1.4rem; margin-bottom:.3rem; }
+    .role-btn .role-label { font-size:.78rem; font-weight:600; color:var(--ink-2); }
+    .role-btn.selected { border-color:var(--green); background:var(--green-light); }
+    .role-btn.selected .role-label { color:var(--green); }
+
+    /* ── PUBLISH PAGE ── */
+    .publish-wrap {
+      max-width:780px; margin:0 auto; padding:2.5rem 2rem;
+    }
+    .publish-header { margin-bottom:2rem; }
+    .publish-header h1 {
+      font-family:'DM Serif Display',serif;
+      font-size:2rem; color:var(--ink);
+    }
+    .publish-header p { color:var(--ink-3); margin-top:.3rem; }
+    .steps-nav {
+      display:flex; gap:0; margin-bottom:2.5rem;
+      border:1px solid var(--border); border-radius:var(--r);
+      overflow:hidden; background:#fff;
+    }
+    .step-item {
+      flex:1; padding:.75rem; text-align:center;
+      font-size:.78rem; font-weight:600; color:var(--ink-3);
+      border-right:1px solid var(--border); cursor:pointer;
+      transition:.18s;
+    }
+    .step-item:last-child { border-right:none; }
+    .step-item.done { background:var(--green-light); color:var(--green); }
+    .step-item.current { background:var(--green); color:#fff; }
+    .pub-card {
+      background:#fff; border-radius:var(--r-lg);
+      border:1px solid var(--border); padding:2rem;
+      box-shadow:var(--shadow); margin-bottom:1.5rem;
+    }
+    .pub-card h3 {
+      font-size:1rem; font-weight:700; margin-bottom:1.4rem;
+      color:var(--ink); display:flex; align-items:center; gap:.5rem;
+    }
+    .form-row { display:flex; gap:1rem; flex-wrap:wrap; }
+    .form-row .form-field { flex:1; min-width:180px; }
+    .img-upload-area {
+      border:2px dashed var(--border); border-radius:var(--r);
+      padding:2.5rem; text-align:center; cursor:pointer;
+      transition:.18s; background:var(--bg);
+    }
+    .img-upload-area:hover { border-color:var(--green); background:var(--green-light); }
+    .img-upload-area .upload-icon { font-size:2rem; margin-bottom:.5rem; }
+    .img-upload-area p { font-size:.84rem; color:var(--ink-3); }
+    .amenity-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+      gap:.6rem;
+    }
+    .amenity-item {
+      padding:.6rem .9rem; border-radius:var(--r);
+      border:1.5px solid var(--border); background:#fff;
+      font-size:.8rem; font-weight:500; cursor:pointer;
+      text-align:center; transition:.18s; color:var(--ink-2);
+    }
+    .amenity-item:hover, .amenity-item.sel {
+      border-color:var(--green); background:var(--green-light); color:var(--green);
+    }
+    .alert-box {
+      padding:1rem 1.2rem; border-radius:var(--r);
+      display:flex; gap:.8rem; align-items:flex-start;
+      font-size:.84rem;
+    }
+    .alert-box.green { background:var(--green-light); color:var(--green); border:1px solid #a7f3d0; }
+    .alert-box.amber { background:var(--amber-light); color:#92400e; border:1px solid #fcd34d; }
+
+    /* ── SCORING PAGE ── */
+    .score-wrap {
+      max-width:820px; margin:0 auto; padding:2.5rem 2rem;
+    }
+    .score-page-header { margin-bottom:2rem; }
+    .score-page-header h1 {
+      font-family:'DM Serif Display',serif; font-size:2rem;
+    }
+    .score-page-header p { color:var(--ink-3); margin-top:.3rem; }
+    .score-grid {
+      display:grid; grid-template-columns:1fr 300px; gap:1.5rem;
+    }
+    @media(max-width:700px) { .score-grid { grid-template-columns:1fr; } }
+    .score-main-card {
+      background:#fff; border-radius:var(--r-lg);
+      border:1px solid var(--border); overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .score-card-head {
+      background:linear-gradient(135deg, #0f3d24, #1a5c38);
+      padding:1.5rem 1.8rem; color:#fff;
+    }
+    .score-card-head h2 { font-family:'DM Serif Display',serif; font-size:1.3rem; }
+    .score-card-head p { font-size:.82rem; color:rgba(255,255,255,.75); margin-top:.3rem; }
+    .score-form { padding:1.8rem; display:flex; flex-direction:column; gap:1.2rem; }
+    .verify-row {
+      display:flex; gap:.7rem; align-items:flex-end; flex-wrap:wrap;
+    }
+    .verify-row .form-field { flex:1; min-width:160px; }
+    .btn-verify {
+      padding:.8rem 1.2rem; border:1.5px solid var(--green);
+      background:#fff; color:var(--green); border-radius:var(--r);
+      font-weight:700; font-size:.82rem; cursor:pointer; white-space:nowrap;
+      transition:.18s; font-family:'DM Sans',sans-serif;
+    }
+    .btn-verify:hover { background:var(--green-light); }
+    .btn-verify.confirmed { background:var(--green); color:#fff; }
+    .sms-block {
+      background:var(--blue-light); border-radius:var(--r);
+      padding:1rem 1.2rem; border-left:3px solid var(--blue);
+      display:none;
+    }
+    .sms-block.visible { display:block; }
+    .sms-inline { display:flex; gap:.6rem; margin-top:.6rem; flex-wrap:wrap; }
+    .doc-upload {
+      border:2px dashed var(--border); border-radius:var(--r);
+      padding:1.2rem; text-align:center; cursor:pointer;
+      transition:.18s; background:var(--bg);
+      font-size:.84rem; color:var(--ink-3);
+    }
+    .doc-upload:hover { border-color:var(--green); background:var(--green-light); }
+    .consent-box {
+      background:#fffbeb; border-radius:var(--r);
+      padding:1rem; border:1px solid #fcd34d;
+    }
+    .consent-box label {
+      display:flex; gap:.75rem; align-items:flex-start;
+      cursor:pointer; font-size:.82rem; line-height:1.5; color:var(--ink-2);
+      text-transform:none; font-weight:400; letter-spacing:0;
+    }
+    .consent-box input[type=checkbox] { margin-top:2px; flex-shrink:0; width:16px; height:16px; }
+    .risk-check-area {
+      background:#f0f4ff; border-radius:var(--r);
+      padding:1rem 1.2rem; border:1px solid #c7d7f5;
+    }
+    .risk-check-row {
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:.5rem;
+    }
+    .risk-results { margin-top:.7rem; font-size:.82rem; line-height:1.7; }
+    .result-block {
+      background:linear-gradient(135deg, #e8f2ec, #f0fdf4);
+      border:1px solid #a7f3d0; border-radius:var(--r-lg);
+      padding:1.5rem; margin-top:1.2rem; display:none;
+    }
+    .result-block.visible { display:block; }
+    .result-score-big {
+      font-family:'DM Serif Display',serif;
+      font-size:4rem; color:var(--green); line-height:1;
+    }
+    .result-score-big small {
+      font-size:1.2rem; color:var(--ink-3); font-family:'DM Sans',sans-serif;
+    }
+    .result-label { font-weight:600; font-size:.9rem; margin:.4rem 0; }
+    .score-bar-wrap { margin:1rem 0; }
+    .score-bar-bg {
+      height:10px; background:#e5e7eb; border-radius:10px; overflow:hidden;
+    }
+    .score-bar-fill {
+      height:100%; border-radius:10px; transition:width 1s ease;
+      background:linear-gradient(90deg, #1a5c38, #2e7d4f);
+    }
+    .score-breakdown {
+      margin-top:1rem; display:flex; flex-direction:column; gap:.5rem;
+    }
+    .breakdown-row {
+      display:flex; align-items:center; gap:.7rem; font-size:.8rem;
+    }
+    .breakdown-label { flex:1; color:var(--ink-2); }
+    .breakdown-bar-bg {
+      width:80px; height:6px; background:#e5e7eb; border-radius:6px; overflow:hidden;
+    }
+    .breakdown-bar-fill { height:100%; border-radius:6px; background:var(--green); }
+    .breakdown-val { width:40px; text-align:right; font-weight:700; color:var(--ink); }
+
+    /* Sidebar score info */
+    .score-sidebar { display:flex; flex-direction:column; gap:1.2rem; }
+    .info-card {
+      background:#fff; border-radius:var(--r-lg);
+      border:1px solid var(--border); padding:1.3rem;
+      box-shadow:var(--shadow);
+    }
+    .info-card h4 { font-size:.88rem; font-weight:700; margin-bottom:.6rem; color:var(--ink); }
+    .info-card p, .info-card li { font-size:.8rem; color:var(--ink-2); line-height:1.6; }
+    .info-card ul { margin-left:1rem; }
+    .badge-small {
+      display:inline-block; padding:.2rem .7rem;
+      border-radius:20px; font-size:.68rem; font-weight:700;
+    }
+    .badge-small.green { background:var(--green-light); color:var(--green); }
+    .badge-small.amber { background:var(--amber-light); color:var(--amber); }
+
+    /* Footer */
+    .footer {
+      background:#0f3d24; color:rgba(255,255,255,.6);
+      padding:2.5rem 2rem; margin-top:3rem;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:1rem; font-size:.78rem;
+    }
+    .footer a { color:rgba(255,255,255,.6); text-decoration:none; }
+    .footer a:hover { color:#fff; }
+    .footer-logo {
+      font-family:'DM Serif Display',serif;
+      font-size:1.2rem; color:#fff;
+    }
+    .footer-logo span { color:#fde68a; }
+
+    /* Notifications / toast */
+    .toast {
+      position:fixed; bottom:1.5rem; right:1.5rem;
+      background:#0f3d24; color:#fff;
+      padding:.9rem 1.4rem; border-radius:var(--r);
+      font-size:.85rem; font-weight:500;
+      box-shadow:var(--shadow-lg); z-index:200;
+      transform:translateY(120%); transition:.3s;
+      display:flex; align-items:center; gap:.6rem;
+    }
+    .toast.show { transform:translateY(0); }
+
+    /* Misc */
+    textarea {
+      width:100%; padding:.8rem 1rem;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      font-size:.9rem; font-family:'DM Sans',sans-serif;
+      resize:vertical; outline:none; transition:.18s; color:var(--ink);
+    }
+    textarea:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(26,92,56,.1); }
+    .status-ok { color:var(--green); font-size:.78rem; font-weight:600; }
+    .status-err { color:var(--red); font-size:.78rem; font-weight:600; }
+    input[type=file] { display:none; }
+
+    @media(max-width:640px) {
+      .topbar { padding:0 1rem; }
+      .topbar-nav .nav-btn:not(.cta):not(.outline) { display:none; }
+      .how-grid { grid-template-columns:1fr 1fr; }
+      .prop-grid { grid-template-columns:1fr; }
+      .stats-bar { flex-direction:column; }
+      .stat-item { border-right:none; border-bottom:1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="logo" onclick="showPage('home')">Renta<span>Ya</span></div>
+  <div class="topbar-nav">
+    <button class="nav-btn active" id="nb-home" onclick="showPage('home')">Alquilar</button>
+    <button class="nav-btn" id="nb-publish" onclick="showPage('publish')">Publicar</button>
+    <button class="nav-btn" id="nb-score" onclick="showPage('score')">Mi Score</button>
+    <button class="nav-btn outline" id="nb-auth" onclick="showPage('auth')">Ingresar</button>
+    <button class="nav-btn cta" onclick="showPage('publish')">+ Publicar propiedad</button>
+  </div>
+</nav>
+
+<!-- ══════════════ HOME PAGE ══════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-content">
+      <h1>El marketplace donde <em>alquilar</em> es confianza real</h1>
+      <p>Propiedades verificadas, inquilinos con score certificado, acuerdos seguros.</p>
+      <div class="search-box">
+        <input type="text" placeholder="🔍  Buscar por zona, distrito o tipo de propiedad…" id="searchInput">
+        <button onclick="doSearch()">Buscar</button>
+      </div>
+      <div class="hero-tags">
+        <span class="tag-pill" onclick="filterProps('Miraflores')">Miraflores</span>
+        <span class="tag-pill" onclick="filterProps('San Isidro')">San Isidro</span>
+        <span class="tag-pill" onclick="filterProps('Barranco')">Barranco</span>
+        <span class="tag-pill" onclick="filterProps('Surco')">Santiago de Surco</span>
+        <span class="tag-pill" onclick="filterProps('La Molina')">La Molina</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num">57,400+</div><div class="stat-label">Propiedades activas</div></div>
+    <div class="stat-item"><div class="stat-num">12,800+</div><div class="stat-label">Inquilinos verificados</div></div>
+    <div class="stat-item"><div class="stat-num">98.2%</div><div class="stat-label">Satisfacción arrendadores</div></div>
+    <div class="stat-item"><div class="stat-num">72h</div><div class="stat-label">Tiempo promedio de cierre</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Propiedades destacadas</div>
+      <span class="see-all">Ver todas →</span>
+    </div>
+    <div class="filter-bar">
+      <span class="chip active" onclick="setChip(this,'all')">Todos</span>
+      <span class="chip" onclick="setChip(this,'dep')">Departamentos</span>
+      <span class="chip" onclick="setChip(this,'casa')">Casas</span>
+      <span class="chip" onclick="setChip(this,'ofic')">Oficinas</span>
+      <span class="chip" onclick="setChip(this,'cuarto')">Habitaciones</span>
+    </div>
+    <div class="prop-grid" id="propGrid"></div>
+  </div>
+
+  <div class="how-section">
+    <div class="how-title">¿Cómo funciona RentaYa?</div>
+    <div class="how-sub">Rápido, seguro y transparente para todos</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon">🔍</div>
+        <h3>Busca y filtra</h3>
+        <p>Encuentra propiedades verificadas en tu zona con filtros precisos de precio, tipo y zona.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">📊</div>
+        <h3>Genera tu Score</h3>
+        <p>Completa tu perfil y obtén un puntaje de confianza basado en Infocorp y REDJUM.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">🤝</div>
+        <h3>Conecta directo</h3>
+        <p>Arrendadores ven tu score antes de contactarte. Menos fricción, más confianza.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">📄</div>
+        <h3>Cierra seguro</h3>
+        <p>Contratos digitales y garantías intermediadas por RentaYa según Ley N° 29733.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo">Renta<span>Ya</span></div>
+    <div>© 2026 RentaYa · Marketplace de Alquiler · Lima, Perú · Ley N° 29733</div>
+    <div><a href="#">Privacidad</a> · <a href="#">Términos</a> · <a href="#">Contacto</a></div>
+  </div>
+</div>
+
+<!-- ══════════════ AUTH PAGE ══════════════ -->
+<div class="page" id="page-auth">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Ingresar</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Registrarse</button>
+      </div>
+      <!-- Login -->
+      <div id="panel-login" class="auth-body">
+        <div class="auth-logo">
+          <h2>¡Bienvenido de vuelta!</h2>
+          <p>Ingresa a tu cuenta para continuar</p>
+        </div>
+        <div class="auth-form">
+          <div class="form-field">
+            <label>Correo electrónico</label>
+            <input type="email" placeholder="tu@correo.com" id="loginEmail">
+          </div>
+          <div class="form-field">
+            <label>Contraseña</label>
+            <input type="password" placeholder="••••••••" id="loginPass">
+          </div>
+          <button class="btn-full green" onclick="doLogin()">Ingresar a mi cuenta</button>
+          <div style="text-align:center; font-size:.82rem; color:var(--ink-3);">
+            ¿Olvidaste tu contraseña? <a href="#" style="color:var(--green);">Recuperar</a>
+          </div>
+        </div>
+      </div>
+      <!-- Register -->
+      <div id="panel-register" class="auth-body" style="display:none;">
+        <div class="auth-logo">
+          <h2>Crear cuenta</h2>
+          <p>Elige cómo quieres usar RentaYa</p>
+        </div>
+        <div class="auth-form">
+          <div class="role-selector" id="roleSelector">
+            <div class="role-btn selected" id="role-tenant" onclick="selectRole('tenant')">
+              <div class="role-icon">🏠</div>
+              <div class="role-label">Soy inquilino</div>
+            </div>
+            <div class="role-btn" id="role-owner" onclick="selectRole('owner')">
+              <div class="role-icon">🏢</div>
+              <div class="role-label">Soy propietario</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Nombres</label><input type="text" placeholder="Juan Carlos"></div>
+            <div class="form-field"><label>Apellidos</label><input type="text" placeholder="Pérez Quispe"></div>
+          </div>
+          <div class="form-field">
+            <label>Correo electrónico</label>
+            <input type="email" placeholder="tu@correo.com">
+          </div>
+          <div class="form-field">
+            <label>Teléfono</label>
+            <input type="tel" placeholder="9XX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label>Contraseña</label>
+            <input type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+          <button class="btn-full green" onclick="doRegister()">Crear mi cuenta gratis</button>
+          <div style="font-size:.72rem; color:var(--ink-3); text-align:center; line-height:1.5;">
+            Al registrarte aceptas nuestros <a href="#" style="color:var(--green);">Términos y Condiciones</a> y <a href="#" style="color:var(--green);">Política de Privacidad</a> según Ley N° 29733.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PUBLISH PAGE ══════════════ -->
+<div class="page" id="page-publish">
+  <div class="publish-wrap">
+    <div class="publish-header">
+      <h1>Publicar propiedad</h1>
+      <p>Completa los pasos para publicar tu propiedad. Los campos con * son obligatorios.</p>
+    </div>
+    <div class="steps-nav">
+      <div class="step-item done" id="ps1">✓ Información</div>
+      <div class="step-item current" id="ps2">2. Detalles</div>
+      <div class="step-item" id="ps3">3. Fotos</div>
+      <div class="step-item" id="ps4">4. Publicar</div>
+    </div>
+
+    <div class="alert-box amber" style="margin-bottom:1.5rem;">
+      <span>⚠️</span>
+      <div>Para publicar, debes tener una cuenta verificada. <a href="#" style="color:var(--amber); font-weight:600;" onclick="showPage('auth')">Ingresar o registrarse →</a></div>
+    </div>
+
+    <div class="pub-card">
+      <h3>📍 Información básica</h3>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Tipo de propiedad *</label>
+            <select>
+              <option value="">Seleccionar</option>
+              <option>Departamento</option>
+              <option>Casa</option>
+              <option>Oficina</option>
+              <option>Habitación</option>
+              <option>Local comercial</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Precio mensual (S/) *</label>
+            <input type="number" placeholder="Ej: 1800">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Dirección *</label>
+          <input type="text" placeholder="Av. Larco 1200, Miraflores">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Distrito *</label>
+            <select>
+              <option>Miraflores</option>
+              <option>San Isidro</option>
+              <option>Barranco</option>
+              <option>Santiago de Surco</option>
+              <option>La Molina</option>
+              <option>San Borja</option>
+              <option>Jesús María</option>
+              <option>Magdalena del Mar</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Piso / Dpto.</label>
+            <input type="text" placeholder="Piso 4, Dpto 402">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pub-card">
+      <h3>📐 Características</h3>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Área (m²) *</label>
+            <input type="number" placeholder="75">
+          </div>
+          <div class="form-field">
+            <label>Dormitorios *</label>
+            <select><option>1</option><option>2</option><option selected>3</option><option>4+</option></select>
+          </div>
+          <div class="form-field">
+            <label>Baños *</label>
+            <select><option>1</option><option selected>2</option><option>3+</option></select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Descripción *</label>
+          <textarea rows="4" placeholder="Describe las características principales de tu propiedad: acabados, vistas, distribución, transporte cercano…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="pub-card">
+      <h3>✅ Amenidades</h3>
+      <div class="amenity-grid" id="amenityGrid">
+        <div class="amenity-item sel" onclick="toggleAmenity(this)">🚗 Estacionamiento</div>
+        <div class="amenity-item sel" onclick="toggleAmenity(this)">🛗 Ascensor</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🏊 Piscina</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🏋️ Gimnasio</div>
+        <div class="amenity-item sel" onclick="toggleAmenity(this)">🔒 Seguridad 24h</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🐾 Pet friendly</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🌿 Áreas verdes</div>
+        <div class="amenity-item sel" onclick="toggleAmenity(this)">📶 Fibra óptica</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🔑 Conserje</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🧺 Cuarto lavandería</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">☀️ Terraza</div>
+        <div class="amenity-item" onclick="toggleAmenity(this)">🏪 Sala de reuniones</div>
+      </div>
+    </div>
+
+    <div class="pub-card">
+      <h3>📸 Fotos de la propiedad</h3>
+      <div class="img-upload-area" onclick="document.getElementById('pubImgInput').click()">
+        <div class="upload-icon">📷</div>
+        <p><strong>Haz clic para subir fotos</strong> o arrastra los archivos aquí</p>
+        <p style="margin-top:.3rem; font-size:.72rem;">JPG, PNG · Máximo 10 fotos · Recomendado: al menos 4 fotos</p>
+        <input type="file" id="pubImgInput" multiple accept="image/*" onchange="handlePubImages(this)">
+      </div>
+      <div id="pubImgStatus" style="margin-top:.7rem; font-size:.82rem; color:var(--green);"></div>
+    </div>
+
+    <div class="pub-card">
+      <h3>🔐 Score mínimo de inquilino</h3>
+      <p style="font-size:.84rem; color:var(--ink-2); margin-bottom:1rem; line-height:1.6;">
+        Puedes establecer un puntaje mínimo requerido para que los inquilinos puedan contactarte. 
+        RentaYa verificará que el solicitante cumpla el estándar antes de compartir tus datos.
+      </p>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Score mínimo requerido</label>
+          <select id="minScore">
+            <option value="0">Sin requisito (cualquiera puede contactar)</option>
+            <option value="55">55+ — Riesgo medio tolerable</option>
+            <option value="70" selected>70+ — Perfil favorable ✅</option>
+            <option value="85">85+ — Perfil Premium únicamente 🏆</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert-box green" style="margin-top:1rem;">
+        <span>✅</span>
+        <div>Con score mínimo 70+, reduces en un 84% las posibilidades de impago según nuestros datos históricos.</div>
+      </div>
+    </div>
+
+    <button class="btn-full green" onclick="doPublish()" style="margin-bottom:2rem;">🚀 Publicar propiedad</button>
+  </div>
+</div>
+
+<!-- ══════════════ SCORE PAGE ══════════════ -->
+<div class="page" id="page-score">
+  <div class="score-wrap">
+    <div class="score-page-header">
+      <h1>Tu Score de Inquilino</h1>
+      <p>Completa tu perfil y obtén un puntaje de confianza que acelera tus procesos de alquiler.</p>
+    </div>
+    <div class="score-grid">
+      <!-- Main form -->
+      <div class="score-main-card">
+        <div class="score-card-head">
+          <h2>📋 Obtén tu puntaje de confianza</h2>
+          <p>Validación de identidad, capacidad de pago y centrales de riesgo · Ley N° 29733</p>
+        </div>
+        <div class="score-form" id="scoreForm">
+
+          <!-- DNI + RENIEC -->
+          <div class="verify-row">
+            <div class="form-field">
+              <label>DNI * (8 dígitos)</label>
+              <input type="text" id="dniField" maxlength="8" placeholder="Ej: 72586025">
+            </div>
+            <div class="form-field">
+              <label>Nombre completo (RENIEC)</label>
+              <input type="text" id="fullNameField" placeholder="Se completará automáticamente">
+            </div>
+            <button class="btn-verify" id="btnReniec" onclick="simReniec()">🔍 Validar RENIEC</button>
+          </div>
+          <div id="reniecStatus" class="status-ok" style="display:none;"></div>
+
+          <!-- Phone + SMS -->
+          <div class="verify-row">
+            <div class="form-field">
+              <label>📱 Celular *</label>
+              <input type="tel" id="phoneField" placeholder="9XX XXX XXX">
+            </div>
+            <button class="btn-verify" onclick="sendSMS()">Enviar SMS</button>
+          </div>
+          <div class="sms-block" id="smsBlock">
+            <div style="font-size:.82rem; font-weight:600; color:var(--blue);">Ingresa el código de 6 dígitos enviado a tu celular</div>
+            <div class="sms-inline">
+              <input type="text" id="smsCode" placeholder="000000" style="width:130px; padding:.6rem .8rem; border:1.5px solid var(--border); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none;">
+              <button class="btn-verify" onclick="verifySMS()">Verificar código</button>
+            </div>
+            <div id="smsStatus" style="font-size:.78rem; margin-top:.4rem;"></div>
+          </div>
+
+          <!-- Financial info -->
+          <div class="form-row">
+            <div class="form-field">
+              <label>Tipo de empleo</label>
+              <select id="employmentType">
+                <option value="">Seleccionar</option>
+                <option value="planilla">En planilla (dependiente)</option>
+                <option value="independiente">Independiente</option>
+                <option value="empresario">Empresario / propio</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Antigüedad laboral</label>
+              <select id="jobSeniority">
+                <option value="menos6">Menos de 6 meses</option>
+                <option value="6a12">6 meses – 1 año</option>
+                <option value="1a3">1 a 3 años</option>
+                <option value="mas3">Más de 3 años</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Ingreso mensual neto (S/) *</label>
+              <input type="number" id="monthlyIncome" placeholder="Ej: 3500">
+            </div>
+            <div class="form-field">
+              <label>Presupuesto de alquiler (S/) *</label>
+              <input type="number" id="rentBudget" placeholder="Ej: 1200">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Historial de alquiler previo</label>
+              <select id="rentalHistory">
+                <option value="nunca">Nunca alquilé</option>
+                <option value="bueno">Buen historial</option>
+                <option value="regular">Regular (algunos retrasos)</option>
+                <option value="malo">Historial negativo</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Nivel de endeudamiento</label>
+              <select id="debtLevel">
+                <option value="sin_deudas">Sin deudas activas</option>
+                <option value="bajo">Bajo (&lt;20% del ingreso)</option>
+                <option value="moderado">Moderado (20–40%)</option>
+                <option value="alto">Alto (&gt;40%)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Doc upload -->
+          <div class="doc-upload" id="docUpload" onclick="document.getElementById('incomeFile').click()">
+            📂 <strong>Adjuntar documento de ingresos obligatorio</strong> (PDF, JPG, PNG)
+            <div style="font-size:.72rem; margin-top:.3rem;">Recibo de sueldo · Declaración jurada · Constancia de trabajo · Estado de cuenta</div>
+            <div id="docStatus" style="color:var(--green); font-weight:600; margin-top:.4rem;"></div>
+            <input type="file" id="incomeFile" accept=".pdf,.jpg,.jpeg,.png" onchange="handleDoc(this)">
+          </div>
+
+          <!-- Consent -->
+          <div class="consent-box">
+            <label>
+              <input type="checkbox" id="dataPrivacyConsent">
+              <span>Acepto la <strong>Política de Protección de Datos Personales (Ley N° 29733)</strong> y autorizo a RentaYa a verificar mi información en centrales de riesgo (Infocorp / REDJUM) exclusivamente para calcular mi score de inquilino.</span>
+            </label>
+          </div>
+
+          <!-- Risk APIs -->
+          <div class="risk-check-area">
+            <div class="risk-check-row">
+              <div>
+                <div style="font-weight:700; font-size:.88rem;">🏦 Validación Centrales de Riesgo</div>
+                <div style="font-size:.75rem; color:var(--ink-3); margin-top:.2rem;">Infocorp (Equifax) + REDJUM · Simulación</div>
+              </div>
+              <button class="btn-verify" onclick="checkRisk()">Consultar ahora</button>
+            </div>
+            <div id="riskResults" class="risk-results"></div>
+          </div>
+
+          <button class="btn-full green" onclick="generateScore()" style="font-size:1rem; padding:1rem;">📊 Generar mi Score de Confianza</button>
+
+          <!-- Score result -->
+          <div class="result-block" id="resultBlock">
+            <div style="display:flex; align-items:flex-end; gap:1rem; flex-wrap:wrap;">
+              <div>
+                <div style="font-size:.75rem; font-weight:700; color:var(--ink-3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.3rem;">TU SCORE</div>
+                <div class="result-score-big" id="scoreBig">—<small>/100</small></div>
+              </div>
+              <div id="scoreLabel" class="result-label"></div>
+            </div>
+            <div class="score-bar-wrap">
+              <div style="display:flex; justify-content:space-between; font-size:.7rem; color:var(--ink-3); margin-bottom:.3rem;">
+                <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+              </div>
+              <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div></div>
+            </div>
+            <div class="score-breakdown" id="scoreBreakdown"></div>
+            <div id="riskExtra" style="margin-top:1rem; font-size:.78rem; padding:.7rem; background:#fff; border-radius:var(--r); border:1px solid var(--border);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="score-sidebar">
+        <div class="info-card">
+          <h4>🔐 ¿Cómo se calcula tu score?</h4>
+          <p>Tu puntaje (0–100) pondera:</p>
+          <ul style="margin-top:.5rem;">
+            <li><strong>30 pts</strong> — Capacidad de pago</li>
+            <li><strong>25 pts</strong> — Historial crediticio</li>
+            <li><strong>15 pts</strong> — Estabilidad laboral</li>
+            <li><strong>10 pts</strong> — Nivel de deudas</li>
+            <li><strong>10 pts</strong> — Historial de alquiler</li>
+            <li><strong>10 pts</strong> — Verificación de identidad</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h4>📌 Centrales de riesgo</h4>
+          <ul>
+            <li><strong>Infocorp (Equifax)</strong> — Deudas bancarias</li>
+            <li style="margin-top:.3rem;"><strong>REDJUM</strong> — Deudores judiciales morosos</li>
+          </ul>
+          <p style="margin-top:.7rem;">Datos tratados según <strong>Ley N° 29733</strong> de protección de datos personales.</p>
+        </div>
+        <div class="info-card">
+          <h4>🏆 Niveles de score</h4>
+          <div style="display:flex; flex-direction:column; gap:.5rem; margin-top:.3rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:.8rem;">85–100</span>
+              <span class="badge-small green">Premium · Riesgo muy bajo</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:.8rem;">70–84</span>
+              <span class="badge-small green">Favorable</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:.8rem;">55–69</span>
+              <span class="badge-small amber">Riesgo medio</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:.8rem;">0–54</span>
+              <span style="font-size:.72rem; background:#fee2e2; color:#991b1b; padding:.2rem .7rem; border-radius:20px; font-weight:700;">Alto riesgo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──
+  let currentPage = 'home';
+  let isReniecOk = false;
+  let isPhoneOk  = false;
+  let hasDoc     = false;
+  let infocorpOk = true;
+  let redjumOk   = true;
+  let smsCodeSent = null;
+  let selectedRole = 'tenant';
+
+  // ── Properties data ──
+  const properties = [
+    { id:1, title:'Depto 3D/2B moderno con vista al mar', price:2800, loc:'Miraflores', type:'dep', area:95, beds:3, baths:2, score:88, emoji:'🏙️', feat:['Amoblado','Estacionamiento','Piscina'] },
+    { id:2, title:'Estudio ejecutivo ideal para profesionales', price:1200, loc:'San Isidro', type:'dep', area:48, beds:1, baths:1, score:72, emoji:'🏢', feat:['Fibra óptica','Gimnasio','Seguridad'] },
+    { id:3, title:'Casa amplia con jardín en zona residencial', price:3500, loc:'La Molina', type:'casa', area:220, beds:4, baths:3, score:91, emoji:'🌳', feat:['Jardín','Cochera doble','Pet friendly'] },
+    { id:4, title:'Habitación amoblada cerca al Parque Kennedy', price:550, loc:'Miraflores', type:'cuarto', area:20, beds:1, baths:1, score:65, emoji:'🛏️', feat:['Servicios incluidos','WiFi','Cocina compartida'] },
+    { id:5, title:'Depto de lujo en el corazón financiero', price:4200, loc:'San Isidro', type:'dep', area:130, beds:3, baths:2, score:95, emoji:'✨', feat:['Premium','Concierge','Terraza'] },
+    { id:6, title:'Departamento acogedor con terraza privada', price:1800, loc:'Barranco', type:'dep', area:72, beds:2, baths:1, score:78, emoji:'🎨', feat:['Terraza','Pet friendly','Amoblado'] },
+    { id:7, title:'Casa de playa / residencia en Surco', price:2200, loc:'Surco', type:'casa', area:180, beds:4, baths:3, score:83, emoji:'🏡', feat:['Jardín','Cochera','Seguridad 24h'] },
+    { id:8, title:'Oficina boutique con sala de reuniones', price:1600, loc:'Miraflores', type:'ofic', area:55, beds:0, baths:1, score:74, emoji:'💼', feat:['Sala reuniones','Fibra óptica','AC'] },
+  ];
+
+  function renderProps(list) {
+    const g = document.getElementById('propGrid');
+    g.innerHTML = list.map(p => {
+      const sc = p.score >= 85 ? 'green' : p.score >= 70 ? 'mid' : 'low';
+      const scLabel = p.score >= 85 ? 'Premium' : p.score >= 70 ? 'Verificado' : 'Básico';
+      const beds = p.beds > 0 ? `${p.beds} dorm.` : '';
+      const featured = p.score >= 90;
+      return `<div class="prop-card" onclick="showToast('📞 Contactando propietario…')">
+        <div class="prop-img">
+          <div class="img-bg"></div>
+          <span style="position:relative;z-index:1">${p.emoji}</span>
+          ${featured ? '<span class="prop-badge featured">Destacado</span>' : '<span class="prop-badge">Alquiler</span>'}
+          <div class="score-pill"><div class="score-dot ${sc}"></div>${p.score}/100 ${scLabel}</div>
+        </div>
+        <div class="prop-body">
+          <div class="prop-price">S/ ${p.price.toLocaleString()} <span>/mes</span></div>
+          <div class="prop-title">${p.title}</div>
+          <div class="prop-loc">📍 ${p.loc} · ${p.area} m²${beds ? ' · '+beds : ''} ${p.baths ? '· '+p.baths+' baños' : ''}</div>
+          <div class="prop-feats">${p.feat.map(f=>`<span class="feat-tag">${f}</span>`).join('')}</div>
+        </div>
+        <div class="prop-footer">
+          <span>Publicado hace ${Math.ceil(Math.random()*10)} días</span>
+          <button class="btn-contact">Contactar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  renderProps(properties);
+
+  function setChip(el, type) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    const list = type === 'all' ? properties : properties.filter(p => p.type === type);
+    renderProps(list);
+  }
+
+  function doSearch() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    if (!q) { renderProps(properties); return; }
+    const res = properties.filter(p => p.title.toLowerCase().includes(q) || p.loc.toLowerCase().includes(q));
+    renderProps(res.length ? res : properties);
+    if (!res.length) showToast('No encontramos resultados exactos. Mostrando similares.');
+  }
+
+  function filterProps(zone) {
+    document.getElementById('searchInput').value = zone;
+    doSearch();
+  }
+
+  // ── Page navigation ──
+  function showPage(pg) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+pg).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const nb = document.getElementById('nb-'+pg);
+    if (nb) nb.classList.add('active');
+    currentPage = pg;
+    window.scrollTo(0, 0);
+  }
+
+  // ── Auth ──
+  function switchAuthTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab==='login');
+    document.getElementById('tab-register').classList.toggle('active', tab==='register');
+    document.getElementById('panel-login').style.display = tab==='login' ? 'block' : 'none';
+    document.getElementById('panel-register').style.display = tab==='register' ? 'block' : 'none';
+  }
+  function selectRole(r) {
+    selectedRole = r;
+    document.getElementById('role-tenant').classList.toggle('selected', r==='tenant');
+    document.getElementById('role-owner').classList.toggle('selected', r==='owner');
+  }
+  function doLogin() {
+    const e = document.getElementById('loginEmail').value;
+    const p = document.getElementById('loginPass').value;
+    if (!e || !p) { showToast('⚠️ Completa todos los campos'); return; }
+    showToast('✅ Ingreso simulado exitoso. ¡Bienvenido!');
+    document.querySelector('.nav-btn.outline').textContent = '👤 Mi perfil';
+    setTimeout(() => showPage('home'), 1200);
+  }
+  function doRegister() {
+    showToast('✅ Cuenta creada. Verifica tu correo electrónico.');
+    setTimeout(() => showPage('home'), 1200);
+  }
+
+  // ── Publish ──
+  function toggleAmenity(el) { el.classList.toggle('sel'); }
+  function handlePubImages(input) {
+    if (input.files.length) {
+      document.getElementById('pubImgStatus').textContent = `✅ ${input.files.length} foto(s) seleccionada(s)`;
+    }
+  }
+  function doPublish() {
+    showToast('🚀 Propiedad publicada exitosamente. ¡Ya está activa!');
+    setTimeout(() => showPage('home'), 1500);
+  }
+
+  // ── Score logic ──
+  function simReniec() {
+    const dni = document.getElementById('dniField').value.trim();
+    const st = document.getElementById('reniecStatus');
+    if (!dni || dni.length !== 8 || isNaN(dni)) {
+      showToast('⚠️ Ingresa un DNI válido de 8 dígitos'); return;
+    }
+    const names = {
+      '72586025':'Eiden Esteban Cáceres Sierra',
+      '12345678':'María Fernández López',
+      '87654321':'Carlos Eduardo Rojas Vega'
+    };
+    const name = names[dni] || `Usuario DNI-${dni} (verificado)`;
+    document.getElementById('fullNameField').value = name;
+    st.textContent = `✅ Identidad validada en RENIEC: ${name}`;
+    st.style.display = 'block';
+    document.getElementById('btnReniec').classList.add('confirmed');
+    document.getElementById('btnReniec').textContent = '✓ Validado';
+    isReniecOk = true;
+  }
+
+  function sendSMS() {
+    const phone = document.getElementById('phoneField').value.trim();
+    if (!phone || phone.length < 9) { showToast('⚠️ Ingresa un celular válido de 9 dígitos'); return; }
+    smsCodeSent = String(Math.floor(100000 + Math.random()*900000));
+    document.getElementById('smsBlock').classList.add('visible');
+    showToast(`[SIMULACIÓN] Código SMS: ${smsCodeSent}`);
+    document.getElementById('smsStatus').textContent = '📨 Código enviado al número ingresado.';
+  }
+
+  function verifySMS() {
+    const code = document.getElementById('smsCode').value.trim();
+    const st = document.getElementById('smsStatus');
+    if (code === smsCodeSent) {
+      isPhoneOk = true;
+      st.textContent = '✅ Teléfono verificado correctamente.';
+      st.className = 'status-ok';
+    } else {
+      st.textContent = '❌ Código incorrecto, intenta de nuevo.';
+      st.className = 'status-err';
+    }
+  }
+
+  function handleDoc(input) {
+    if (input.files[0]) {
+      hasDoc = true;
+      const f = input.files[0];
+      document.getElementById('docStatus').textContent = `✅ ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+    }
+  }
+
+  function checkRisk() {
+    const dni = document.getElementById('dniField').value.trim();
+    if (!dni || dni.length !== 8) { showToast('⚠️ Ingresa tu DNI antes de consultar centrales de riesgo'); return; }
+    infocorpOk = Math.random() > 0.3;
+    redjumOk   = Math.random() > 0.1;
+    const r = document.getElementById('riskResults');
+    r.innerHTML =
+      (infocorpOk ? '✅ <strong>Infocorp:</strong> Sin deudas bancarias reportadas.' : '⚠️ <strong>Infocorp:</strong> Deudas activas detectadas (impacto –15 pts).') + '<br>' +
+      (redjumOk   ? '✅ <strong>REDJUM:</strong> Sin antecedentes de deuda judicial.' : '⚠️ <strong>REDJUM:</strong> Registro como deudor judicial moroso (impacto –18 pts).');
+  }
+
+  function generateScore() {
+    if (!isReniecOk) { showToast('⚠️ Debes validar tu identidad con RENIEC'); return; }
+    if (!isPhoneOk)  { showToast('⚠️ Debes verificar tu teléfono vía SMS'); return; }
+    if (!hasDoc)     { showToast('⚠️ Debes adjuntar documento de ingresos'); return; }
+    if (!document.getElementById('dataPrivacyConsent').checked) { showToast('⚠️ Debes aceptar la Política de Datos (Ley N° 29733)'); return; }
+
+    const income = parseFloat(document.getElementById('monthlyIncome').value);
+    const rent   = parseFloat(document.getElementById('rentBudget').value);
+    const emp    = document.getElementById('employmentType').value;
+    const sen    = document.getElementById('jobSeniority').value;
+    const debt   = document.getElementById('debtLevel').value;
+    const hist   = document.getElementById('rentalHistory').value;
+
+    if (!income || !rent || income <= 0 || rent <= 0) { showToast('⚠️ Ingresa valores válidos de ingreso y presupuesto'); return; }
+
+    // Capacity (30)
+    const ratio = (rent/income)*100;
+    const cap = ratio<=30 ? 30 : ratio<=45 ? 22 : ratio<=60 ? 12 : 5;
+
+    // Credit (25)
+    let cred = debt==='sin_deudas'?25 : debt==='bajo'?20 : debt==='moderado'?12 : 5;
+    if (!infocorpOk) cred = Math.max(0, cred-12);
+    if (!redjumOk)   cred = Math.max(0, cred-18);
+
+    // Stability (15)
+    let stab = 0;
+    if (emp==='planilla') stab = sen==='mas3'?15:sen==='1a3'?12:sen==='6a12'?9:6;
+    else if (emp==='independiente') stab = sen==='mas3'?12:sen==='1a3'?9:sen==='6a12'?7:4;
+    else stab = sen==='mas3'?13:sen==='1a3'?10:6;
+
+    // Debt (10)
+    const dp = debt==='sin_deudas'?10:debt==='bajo'?8:debt==='moderado'?5:2;
+
+    // Rental hist (10)
+    const rp = hist==='bueno'?10:hist==='regular'?5:hist==='malo'?1:5;
+
+    // Verification (10)
+    const vp = 10;
+
+    const total = Math.min(100, Math.max(0, Math.floor(cap+cred+stab+dp+rp+vp)));
+
+    // Render
+    document.getElementById('scoreBig').innerHTML = `${total}<small>/100</small>`;
+    const label = total>=85 ? '🏆 Inquilino Premium · Riesgo muy bajo' :
+                  total>=70 ? '✅ Perfil favorable · Riesgo bajo' :
+                  total>=55 ? '⚠️ Riesgo medio · Pide garantías adicionales' :
+                              '🔴 Alto riesgo · No recomendado sin avales';
+    document.getElementById('scoreLabel').innerHTML = label;
+
+    const scoreBarFill = document.getElementById('scoreBarFill');
+    scoreBarFill.style.width = '0%';
+    setTimeout(() => { scoreBarFill.style.width = total+'%'; }, 50);
+    if (total < 55) scoreBarFill.style.background = 'linear-gradient(90deg,#dc2626,#f87171)';
+    else if (total < 70) scoreBarFill.style.background = 'linear-gradient(90deg,#d97706,#fbbf24)';
+
+    const breakdown = [
+      { label:'Capacidad de pago', val:cap, max:30 },
+      { label:'Historial crediticio', val:cred, max:25 },
+      { label:'Estabilidad laboral', val:stab, max:15 },
+      { label:'Nivel de deudas', val:dp, max:10 },
+      { label:'Historial de alquiler', val:rp, max:10 },
+      { label:'Verificación identidad', val:vp, max:10 },
+    ];
+    document.getElementById('scoreBreakdown').innerHTML = breakdown.map(b => `
+      <div class="breakdown-row">
+        <div class="breakdown-label">${b.label}</div>
+        <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(b.val/b.max)*100}%"></div></div>
+        <div class="breakdown-val">${b.val}/${b.max}</div>
+      </div>`).join('');
+
+    document.getElementById('riskExtra').innerHTML =
+      (!infocorpOk || !redjumOk)
+        ? '⚠️ <strong>Alertas en centrales de riesgo:</strong> ' + (!infocorpOk?'Deudas bancarias activas. ':' ') + (!redjumOk?'Antecedente en REDJUM.':'')
+        : '📌 <strong>Sin alertas</strong> en Infocorp ni REDJUM. Perfil limpio en centrales de riesgo.';
+
+    document.getElementById('resultBlock').classList.add('visible');
+    showToast(`🎯 Score generado: ${total}/100`);
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // Enter on search
+  document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key==='Enter') doSearch(); });
+</script>
+</body>
+</html>
